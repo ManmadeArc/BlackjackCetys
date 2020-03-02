@@ -234,9 +234,9 @@ class Juego():
     def Comprobar_Seguro(self,i):
         if self.Dealer.Manos[0].Obtener_Valor(0)=="A" and len(self.Dealer.Manos[0].Cartas)==2 and self.Ronda==0:
             z=input("La primera Carta del Dealer es un AS\n[1]Comprar Seguro\n[Cualquie otra cosa]No Comprar Seguro\nIntroduzca la accion a realizar: ")
-            return z=="1"
             os.system("cls")
             self.Imprimir_Manos(i)
+            return z=="1"
         else:
             return False
 
