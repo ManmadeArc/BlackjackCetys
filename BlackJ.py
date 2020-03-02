@@ -30,23 +30,16 @@ class Mano():
         self.Cartas=Cartas
 
     def Obtener_valor_num(self,Carta_A_Obtener):
-        Valor_tmp=""
-        Puntos=0
-        for i in range( len(self.Cartas[Carta_A_Obtener])-1):
-            Valor_tmp+= self.Cartas[Carta_A_Obtener][i]
-        if Valor_tmp=="A":
-            Puntos=1
-        elif Valor_tmp=="J" or Valor_tmp=="Q" or Valor_tmp=="K":
-            Puntos=10
-        else:
-            Puntos=int(Valor_tmp)
-        return(Puntos)
+        
+        Valor=self.Obtener_Valor(Carta_A_Obtener)
+        if Valor=="A":
+            Valor=1
+        elif Valor=="J" or Valor=="Q" or Valor=="K":
+            Valor=10
+        return int(Valor)
     
     def Obtener_Valor(self,Carta_A_Obtener):
-        Valor_tmp=""
-        for i in range( len(self.Cartas[Carta_A_Obtener])-1):
-            Valor_tmp+= self.Cartas[Carta_A_Obtener][i]
-        return Valor_tmp
+        return self.Cartas[Carta_A_Obtener][:-1]
 
     def Obtener_Sumatoria_pts(self):
         Cantidad_AS=0
@@ -80,7 +73,6 @@ class Jugador():
         self.Dinero=Dinero
         self.Nombre="Jugador 1"
         if self.Dealer:
-            self.Dinero=10000000000000000000000000000000000000000000000000000000000000000000000000000000000000-1
             self.Nombre="Dealer"
 
     def Verificar_Seguro(self,Num_Mano):
@@ -113,22 +105,17 @@ class Juego():
         self.Finalizado=False
         self.Mano_Act=0
 
-    def SetUp(self,Dinero=15000):
-        self.Ronda=0
-        self.Finalizado=False
-        self.Mano_Act=0
-        self.Baraja=Mazo()
-        self.Baraja.CrearMazo()
-        self.Baraja.multiplicarMazos(4)
-        self.Baraja.mezclar_Mazo()
+    def Repartir_Manos(self):
         ManoDealer=[self.Baraja.Mazo[0],self.Baraja.Mazo[1]]
         self.Baraja.eliminar_Primer_Elemento(2)
         ManoDealer1=Mano(ManoDealer)
         self.Dealer=Jugador(ManoDealer1,True)
-        ManoJ1=[self.Baraja.Mazo[0],self.Baraja.Mazo[0]]
+        ManoJ1=[self.Baraja.Mazo[0],self.Baraja.Mazo[1]]
         ManoJ11=Mano(ManoJ1)
         self.Baraja.eliminar_Primer_Elemento(2)
         self.Jugador1=Jugador(ManoJ11)
+    
+    def Apostar(self):
         print("Su Cantidad De Dinero Es:",self.Jugador1.Dinero)
         Cantidad_apuesta=0
         try:
@@ -141,6 +128,24 @@ class Juego():
             Cantidad_apuesta=Cantidad_apuesta
         self.Jugador1.Apuesta.append(Cantidad_apuesta)
         self.Jugador1.Dinero+=-1*(Cantidad_apuesta)
+
+    def CrearMazo(self):
+        self.Baraja=Mazo()
+        self.Baraja.CrearMazo()
+        self.Baraja.multiplicarMazos(4)
+        self.Baraja.mezclar_Mazo()
+
+    def SetUp(self,Dinero=15000):
+        self.Ronda=0
+        self.Finalizado=False
+        self.Mano_Act=0
+        
+        self.CrearMazo()
+        self.Repartir_Manos()
+        self.Jugador1.Dinero=Dinero
+        self.Apostar()
+        
+        
         
         
     def SplitearMano(self):
@@ -166,8 +171,10 @@ class Juego():
         self.Jugador1.Dinero+=-1*self.Jugador1.Apuesta[self.Mano_Act]/2
 
     def Rendirse(self,Num_Mano):
+        input(self.Jugador1.Rendirse[self.Mano_Act])
         self.Jugador1.plantarse[self.Mano_Act]=True
         self.Jugador1.Rendirse[self.Mano_Act]=True
+        
 
     def Comprobar_Fin(self):
         contador=0
@@ -206,7 +213,6 @@ class Juego():
     def Imprimir_Mano_CasaGana(self):
             
             print(self.Dealer.Nombre)
-            
             self.Dealer.Imprimir_Mano()
             print("\n")
             print(self.Jugador1.Nombre,"Mano: ",self.Mano_Act+1 )
@@ -218,24 +224,28 @@ class Juego():
     def Comprobar_Split(self, i):
         if i.Obtener_Valor(0)==i.Obtener_Valor(1) and self.Ronda==0:
             x=input("Desea hacer split\n [1]Si\n[Cualquier otra Tecla]No\nIntroduza su respuesta: ")
-            if x=="1":
-                return True
+            os.system("cls")
+            self.Imprimir_Manos(i)
+            return x=="1"
+            
         else:
             return False
     
     def Comprobar_Seguro(self,i):
         if self.Dealer.Manos[0].Obtener_Valor(0)=="A" and len(self.Dealer.Manos[0].Cartas)==2 and self.Ronda==0:
             z=input("La primera Carta del Dealer es un AS\n[1]Comprar Seguro\n[Cualquie otra cosa]No Comprar Seguro\nIntroduzca la accion a realizar: ")
-            if z=="1":
-                return True
+            return z=="1"
+            os.system("cls")
+            self.Imprimir_Manos(i)
         else:
             return False
 
     def Comprobar_Rendirse(self,i):
         if self.Ronda==0:
-            y=input("Desea Rendirse?\n1[Si]\n[Cualquier Otra Cosa]No\n Introduzca su opcion: ")
-            if y=="1":
-                return True
+            y=input("Desea Rendirse?\n[1]Si\n[Cualquier Otra Cosa]No\n Introduzca su opcion: ")
+            os.system("cls")
+            self.Imprimir_Manos(i)
+            return y=="1"
         else:
             return False
 
@@ -253,7 +263,7 @@ class Juego():
     def Plantarse(self,i):
         self.Jugador1.plantarse[self.Mano_Act]=True
     
-    def Comprobar_Victorias(self):
+    def Mostrar_Victorias(self):
         for i in self.Jugador1.Manos:
             self.Mano_Act=self.Jugador1.Manos.index(i)
 
@@ -262,7 +272,7 @@ class Juego():
                 if self.Dealer.Manos[0].Obtener_Sumatoria_pts()==21 and len(self.Dealer.Manos[0].Cartas)==2:
                     
                     print("HAS GANADO EL DINERO DEL SEGURO")
-                    self.Jugador1.Dinero+=self.Jugador1.Dinero.Seguro_Ap[self.Mano_Act]*3
+                    self.Jugador1.Dinero+=self.Jugador1.Seguro_Ap[self.Mano_Act]*3
                     print("Su dinero ahora es",self.Jugador1.Dinero)
                     input("Presione Cualquier Tecla Para Continuar: ")
                     
@@ -304,13 +314,9 @@ class Juego():
             os.system("cls")
 
 
-        
-
-
-
     def BucleJuego(self):
         x=False    
-        while not self.Finalizado and self.Ronda<3:
+        while not self.Finalizado and not self.Ronda>3:
 
             for i in self.Jugador1.Manos:
                
@@ -328,13 +334,14 @@ class Juego():
                         self.Comprar_seguro(self.Mano_Act)
                     if self.Comprobar_Rendirse(i):
                         self.Rendirse(self.Mano_Act)
+                    
                     Accion=input("[1]Doblar Apuesta\n[2]Pedir Otra Carta\n[Cualquier otra cosa]Plantarse\n Introduca la accion a realizar:" )
                     if Accion=="1":
                         self.doblar_Apuesta(self.Mano_Act)
                     elif Accion=="2":
                         self.Pedir_otra_Carta(self.Mano_Act)
                     else:
-                        self.Rendirse(self.Mano_Act)
+                        self.Plantarse(self.Mano_Act)
                     if self.Jugador1.Manos[self.Mano_Act].Obtener_Sumatoria_pts()>=21:
                         self.Plantarse(self.Mano_Act)
                 os.system("cls")
@@ -344,16 +351,6 @@ class Juego():
                 x=False
                 continue
             self.Ronda+=1
-        self.Comprobar_Victorias()
-        print("XD")
+        self.Mostrar_Victorias()
 
             
-                    
-
-            
-
-
-
-
-
-
