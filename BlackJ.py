@@ -117,7 +117,7 @@ class Juego():
         self.Ronda=0
         self.Finalizado=False
         self.Mano_Act=0
-        self.Baraja()=Mazo()
+        self.Baraja=Mazo()
         self.Baraja.CrearMazo()
         self.Baraja.multiplicarMazos(4)
         self.Baraja.mezclar_Mazo()
